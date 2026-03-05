@@ -96,7 +96,7 @@ jobs:
 
       # Tests
       - name: Run pytest
-        run: python -m pytest tests/ -v --tb=short -x
+        run: python -m pytest tests/ -v --tb=long
 
   # ── 3. Build Docker Images ────────────────────────
   build:

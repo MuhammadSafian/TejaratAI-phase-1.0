@@ -18,3 +18,5 @@ pandas
 PyJWT
 zeep
 redis[hiredis]
+pytest
+pytest-asyncio

@@ -96,7 +96,7 @@ jobs:
 
       # Tests
       - name: Run pytest
-        run: python -m pytest tests/ -v --tb=long
+        run: python -m pytest tests/ -v --tb=long -p pytest_asyncio --asyncio-mode=auto
 
   # ── 3. Build Docker Images ────────────────────────
   build:

@@ -75,6 +75,7 @@ jobs:
 
       - name: Install dependencies
         run: |
+          sudo apt-get update && sudo apt-get install -y postgresql-client
           pip install -r requirements.txt
           pip install pytest pytest-asyncio httpx ruff bandit
 
@@ -89,7 +90,9 @@ jobs:
       # Init test DB
       - name: Initialize test database
         run: |
-          PGPASSWORD=testpass psql -h localhost -U postgres -d tijarat_test -f ../../init-scripts/init.sql || true
+          psql -h localhost -U postgres -d tijarat_test -f ../../init-scripts/init.sql
+        env:
+          PGPASSWORD: testpass
 
       # Tests
       - name: Run pytest

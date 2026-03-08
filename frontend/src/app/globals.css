@@ -1,0 +1,235 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-dm-sans);
+  --font-heading: var(--font-syne);
+  --font-mono: var(--font-jetbrains-mono);
+  --font-urdu: var(--font-urdu);
+
+  --color-background: var(--bg-base);
+  --color-foreground: var(--text-primary);
+
+  --color-card: var(--bg-surface);
+  --color-card-foreground: var(--text-primary);
+
+  --color-popover: var(--bg-elevated);
+  --color-popover-foreground: var(--text-primary);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: #000000;
+
+  --color-secondary: transparent;
+  --color-secondary-foreground: var(--primary);
+
+  --color-muted: var(--text-muted);
+  --color-muted-foreground: var(--text-muted);
+
+  --color-accent: var(--bg-elevated);
+  --color-accent-foreground: var(--text-primary);
+
+  --color-destructive: var(--danger);
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--primary);
+
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --radius-sm: 6px;
+
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(0, 229, 160, 0.08);
+  --shadow-glow-active: 0 0 24px rgba(0, 229, 160, 0.2), 0 0 0 1px rgba(0, 229, 160, 0.3);
+  --shadow-glow-subtle: 0 0 12px rgba(0, 229, 160, 0.08);
+
+  /* Adding direct access to new specific tokens not standard in base tailwind */
+  --color-border-strong: var(--border-strong);
+  --color-bg-base: var(--bg-base);
+  --color-bg-surface: var(--bg-surface);
+  --color-bg-elevated: var(--bg-elevated);
+  --color-text-secondary: var(--text-secondary);
+}
+
+:root {
+  --primary: #00E5A0;
+  --primary-dim: #00C27F;
+  --primary-glow: rgba(0, 229, 160, 0.15);
+
+  --bg-base: #080C0A;
+  --bg-surface: #0E1612;
+  --bg-elevated: #162019;
+
+  --border: rgba(0, 229, 160, 0.12);
+  --border-strong: rgba(0, 229, 160, 0.28);
+
+  --text-primary: #F0FFF8;
+  --text-secondary: #8BA898;
+  --text-muted: #4A6358;
+
+  --danger: #FF4D6A;
+  --warning: #FFB347;
+  --success: #00E5A0;
+
+  --radius: 10px;
+}
+
+/* Because this is a dark-mode only SaaS platform as per design docs, force dark defaults onto root attributes as well */
+.dark {
+  /* Duplicating root for force dark support */
+  --primary: #00E5A0;
+  --bg-base: #080C0A;
+  --bg-surface: #0E1612;
+  --bg-elevated: #162019;
+  --border: rgba(0, 229, 160, 0.12);
+  --text-primary: #F0FFF8;
+  --danger: #FF4D6A;
+}
+
+* {
+  border-color: var(--color-border);
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-dm-sans), sans-serif;
+}
+
+/* Animations defined in redesign spec */
+@keyframes fadeSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+.stagger-1 {
+  animation-delay: 0.06s;
+}
+
+.stagger-2 {
+  animation-delay: 0.12s;
+}
+
+.stagger-3 {
+  animation-delay: 0.18s;
+}
+
+.stagger-4 {
+  animation-delay: 0.24s;
+}
+
+/* FAQ Accordion Transition */
+.faq-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.faq-item.open .faq-content {
+  max-height: 500px;
+  /* arbitrary large enough value */
+}
+
+/* Pricing Toggle Transition */
+.pricing-toggle {
+  transition: all 0.2s ease;
+}
+
+/* Custom Headings */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading), sans-serif;
+}
+
+.font-mono {
+  font-family: var(--font-jetbrains-mono), monospace;
+}
+
+/* Animated Mesh Background for Hero */
+.mesh-gradient-bg {
+  position: relative;
+  background-color: var(--bg-base);
+  overflow: hidden;
+}
+
+.mesh-gradient-bg::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at center, var(--primary-glow) 0%, transparent 50%);
+  animation: meshRotate 20s linear infinite;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@keyframes meshRotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Nav Link Hover Underline Slide */
+.nav-link-hover {
+  position: relative;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.nav-link-hover::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -4px;
+  left: 0;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.nav-link-hover:hover::after {
+  width: 100%;
+}
+
+.nav-link-hover:hover {
+  color: var(--primary);
+}
+
+/* Pulsing Button animation */
+@keyframes pulseGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 160, 0.4);
+  }
+
+  70% {
+    box-shadow: 0 0 0 15px rgba(0, 229, 160, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 160, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2s infinite;
+}

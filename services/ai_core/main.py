@@ -32,7 +32,9 @@ app.add_middleware(
 
 # ── Auth Routes (OTP + Google Login) ─────────────────
 from routes.auth_routes import router as auth_router
+from routes.data_routes import router as data_router
 app.include_router(auth_router)
+app.include_router(data_router)
 
 # ── Pydantic Models ──────────────────────────────────
 class OrderProcessRequest(BaseModel):
@@ -48,6 +50,10 @@ class ShipmentUpdateRequest(BaseModel):
 class AnalysisRequest(BaseModel):
     seller_id: str
     analysis_type: str = "daily"
+
+class ChatRequest(BaseModel):
+    message: str
+    history: Optional[list] = []
 
 # ── Routes ───────────────────────────────────────────
 @app.get("/health")
@@ -98,3 +104,49 @@ async def rto_check(seller_id: str, phone: str, city: str, amount: float = 0):
     )
     risk = "low" if score < 31 else ("medium" if score < 61 else "high")
     return {"rto_score": score, "risk_level": risk, "signals": signals}
+
+@app.post("/api/v1/seller/{seller_id}/chat")
+async def chat_with_agent(seller_id: str, req: ChatRequest):
+    # This is the Brain of TijaratAI Chat
+    # It bridges natural language queries to our 4-agent core
+    try:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        from core.config import settings
+        
+        if not settings.GOOGLE_API_KEY:
+            # Fallback if no API key
+            return {
+                "message": "AI core is in 'Local Protocol' mode. I can see your dashboard data but Gemini brain is offline. How can I help with your inventory?",
+                "role": "assistant"
+            }
+
+        llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.7)
+        
+        # Pull context from DB for personal touch
+        from core import db
+        seller = await db.fetch_one("SELECT name FROM sellers WHERE id = $1", seller_id)
+        seller_name = seller["name"] if seller else "Safian"
+        
+        # Create a system prompt that gives the AI 'Consciousness' of the business
+        system_prompt = f"""You are 'TijaratAI Supervisor', the neural brain of a premium e-commerce management platform for Pakistan.
+Your user is {seller_name}.
+You have access to:
+1. Sales Agent (Predictive trends)
+2. Inventory Agent (Stock velocity)
+3. Logistics Agent (RTO risk & Courier ROI)
+4. Supervisor Agent (Health Score Logic)
+
+Your tone: Professional, 'Terminal-inspired', slightly futuristic, and helpful. 
+Language: Mix of English and Roman Urdu (Hinglish/Urdu-ish) to feel local.
+Always include a short Urdu summary at the end of technical advice.
+
+User Query: {req.message}"""
+
+        response = await llm.ainvoke(system_prompt)
+        return {
+            "message": response.content,
+            "role": "assistant"
+        }
+    except Exception as e:
+        print(f"Chat error: {e}")
+        raise HTTPException(status_code=500, detail="Neural core connection failed")
